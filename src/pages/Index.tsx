@@ -1,5 +1,8 @@
 import { useState } from "react";
 import Icon from "@/components/ui/icon";
+import Intro from "@/components/Intro";
+import TrailerModal from "@/components/TrailerModal";
+import { sound } from "@/components/SoundEngine";
 
 type Section = "home" | "matches" | "cases" | "rating" | "profile" | "market" | "clans" | "settings";
 
@@ -90,9 +93,21 @@ const tierColors: Record<string, string> = {
 
 export default function Index() {
   const [activeSection, setActiveSection] = useState<Section>("home");
+  const [showIntro, setShowIntro] = useState(true);
+  const [showTrailer, setShowTrailer] = useState(false);
+
+  const handleNav = (id: Section) => {
+    sound.openSection();
+    setActiveSection(id);
+  };
+
+  if (showIntro) {
+    return <Intro onDone={() => setShowIntro(false)} />;
+  }
 
   return (
     <div className="min-h-screen bg-[#131610] grid-overlay font-rubik">
+      {showTrailer && <TrailerModal onClose={() => setShowTrailer(false)} />}
       {/* Top Bar */}
       <header className="fixed top-0 left-0 right-0 z-50 h-14 military-card border-b border-[rgba(90,99,53,0.3)] flex items-center px-4 gap-4">
         <div className="flex items-center gap-3">
@@ -125,7 +140,8 @@ export default function Index() {
           {navItems.map((item) => (
             <button
               key={item.id}
-              onClick={() => setActiveSection(item.id)}
+              onClick={() => handleNav(item.id)}
+              onMouseEnter={() => sound.hover()}
               className={`w-full flex items-center gap-3 px-3 py-2.5 mb-1 transition-all duration-150 text-left
                 ${activeSection === item.id
                   ? "bg-[rgba(90,99,53,0.3)] border border-[rgba(143,160,64,0.3)] text-[#8fa040]"
@@ -157,36 +173,65 @@ export default function Index() {
       </aside>
 
       {/* Main Content */}
-      <main className="ml-52 pt-14 min-h-screen">
-        {activeSection === "home" && <HomeSection />}
-        {activeSection === "matches" && <MatchesSection />}
-        {activeSection === "cases" && <CasesSection />}
-        {activeSection === "rating" && <RatingSection />}
-        {activeSection === "profile" && <ProfileSection />}
-        {activeSection === "market" && <MarketSection />}
-        {activeSection === "clans" && <ClansSection />}
-        {activeSection === "settings" && <SettingsSection />}
+      <main className="ml-52 pt-14 min-h-screen" key={activeSection}>
+        <div className="section-enter">
+          {activeSection === "home" && <HomeSection onTrailer={() => setShowTrailer(true)} />}
+          {activeSection === "matches" && <MatchesSection />}
+          {activeSection === "cases" && <CasesSection />}
+          {activeSection === "rating" && <RatingSection />}
+          {activeSection === "profile" && <ProfileSection />}
+          {activeSection === "market" && <MarketSection />}
+          {activeSection === "clans" && <ClansSection />}
+          {activeSection === "settings" && <SettingsSection />}
+        </div>
       </main>
     </div>
   );
 }
 
 /* ─────────────────────── HOME ─────────────────────── */
-function HomeSection() {
+function HomeSection({ onTrailer }: { onTrailer: () => void }) {
   return (
     <div className="p-6 animate-fade-in-up">
       {/* Hero */}
-      <div className="relative h-64 mb-6 overflow-hidden" style={{ borderRadius: 2 }}>
-        <img src={HERO_IMG} alt="Confrontation" className="w-full h-full object-cover" />
+      <div className="relative h-72 mb-6 overflow-hidden group" style={{ borderRadius: 2 }}>
+        <img src={HERO_IMG} alt="Confrontation" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
         <div className="absolute inset-0 bg-gradient-to-r from-[#131610]/90 via-[#131610]/50 to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#131610]/80 via-transparent to-transparent" />
+        {/* Scanline effect */}
+        <div className="absolute inset-0 pointer-events-none" style={{
+          backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.04) 3px, rgba(0,0,0,0.04) 4px)"
+        }} />
         <div className="absolute inset-0 flex flex-col justify-end p-8">
-          <div className="tag-military mb-2 inline-block w-fit">// СЕЗОН 4 АКТИВЕН</div>
-          <h1 className="heading-military text-5xl text-[rgba(232,240,176,1)] mb-2">CONFRONTATION</h1>
-          <p className="text-[rgba(232,240,176,0.6)] font-rubik text-sm max-w-md">Тактические сражения. Реальная экономика. Настоящий рейтинг.</p>
-          <div className="flex gap-3 mt-4">
-            <button className="btn-primary-military text-sm">Найти матч</button>
-            <button className="btn-military text-sm">Обучение</button>
+          <div className="tag-military mb-2 inline-block w-fit animate-fade-in-up">// СЕЗОН 4 АКТИВЕН</div>
+          <h1 className="heading-military text-5xl text-[rgba(232,240,176,1)] mb-2 animate-fade-in-up delay-100" style={{
+            textShadow: "0 0 40px rgba(143,160,64,0.3)"
+          }}>CONFRONTATION</h1>
+          <p className="text-[rgba(232,240,176,0.6)] font-rubik text-sm max-w-md animate-fade-in-up delay-200">Тактические сражения. Реальная экономика. Настоящий рейтинг.</p>
+          <div className="flex gap-3 mt-4 animate-fade-in-up delay-300">
+            <button
+              className="btn-primary-military text-sm flex items-center gap-2"
+              onClick={() => sound.click()}
+              onMouseEnter={() => sound.hover()}
+            >
+              <Icon name="Crosshair" size={14} />
+              Найти матч
+            </button>
+            <button
+              className="btn-military text-sm flex items-center gap-2"
+              onClick={() => { sound.click(); onTrailer(); }}
+              onMouseEnter={() => sound.hover()}
+            >
+              <Icon name="Play" size={14} />
+              Смотреть трейлер
+            </button>
+            <button
+              className="btn-military text-sm flex items-center gap-2"
+              onClick={() => sound.click()}
+              onMouseEnter={() => sound.hover()}
+            >
+              Обучение
+            </button>
           </div>
         </div>
       </div>
@@ -317,7 +362,7 @@ function MatchesSection() {
                 <div className="font-mono text-[10px] text-[rgba(107,122,58,0.5)] mt-0.5">КОМАНДА А</div>
               </div>
               <div className="text-center">
-                <div className={`heading-military text-3xl font-bold ${m.status === "live" ? "text-[#8fa040]" : "text-[rgba(232,240,176,0.6)]"}`}>{m.score}</div>
+                <div className={`heading-military text-3xl font-bold ${m.status === "live" ? "score-live" : "text-[rgba(232,240,176,0.6)]"}`}>{m.score}</div>
                 <div className="font-mono text-[10px] text-[rgba(107,122,58,0.4)]">{m.time}</div>
               </div>
               <div className="text-center">
@@ -374,7 +419,7 @@ function CasesSection() {
             <div className="divider-military mb-3" />
             <div className="flex items-center justify-between mt-auto">
               <span className="font-oswald text-lg text-[#c4a96a]">{c.price.toLocaleString()} ₿</span>
-              <button onClick={() => setOpening(c.id)} className="btn-primary-military text-xs px-4 py-2">Открыть</button>
+              <button onClick={() => { sound.click(); setOpening(c.id); }} onMouseEnter={() => sound.hover()} className="btn-primary-military text-xs px-4 py-2">Открыть</button>
             </div>
           </div>
         ))}
@@ -387,8 +432,8 @@ function CasesSection() {
             <div className="heading-military text-xl text-[rgba(232,240,176,0.9)] mb-2">{cases.find(c => c.id === opening)?.name}</div>
             <div className="font-rubik text-sm text-[rgba(232,240,176,0.5)] mb-6">Готов открыть кейс?</div>
             <div className="flex gap-3">
-              <button className="btn-primary-military flex-1" onClick={() => setOpening(null)}>Открыть</button>
-              <button className="btn-military flex-1" onClick={() => setOpening(null)}>Отмена</button>
+              <button className="btn-primary-military flex-1" onClick={() => { sound.openCase(); setOpening(null); }}>Открыть</button>
+              <button className="btn-military flex-1" onClick={() => { sound.click(); setOpening(null); }}>Отмена</button>
             </div>
           </div>
         </div>
@@ -596,7 +641,7 @@ function MarketSection() {
             <div className="divider-military mb-3" />
             <div className="flex items-center justify-between mt-auto">
               <span className="font-oswald text-lg text-[#c4a96a]">{item.price.toLocaleString()} ₿</span>
-              <button className="btn-primary-military text-xs px-3 py-1.5">Купить</button>
+              <button className="btn-primary-military text-xs px-3 py-1.5" onClick={() => sound.buy()} onMouseEnter={() => sound.hover()}>Купить</button>
             </div>
           </div>
         ))}

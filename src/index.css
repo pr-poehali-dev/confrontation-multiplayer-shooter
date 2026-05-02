@@ -251,4 +251,98 @@
   .delay-500 {
     animation-delay: 0.5s;
   }
+
+  /* Section transition */
+  @keyframes sectionSlideIn {
+    from {
+      opacity: 0;
+      transform: translateX(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  .section-enter {
+    animation: sectionSlideIn 0.3s ease-out forwards;
+  }
+
+  /* Glitch text effect */
+  @keyframes glitchShift {
+    0%,
+    100% {
+      clip-path: inset(0 0 100% 0);
+      transform: translateX(0);
+    }
+    20% {
+      clip-path: inset(30% 0 50% 0);
+      transform: translateX(-4px);
+    }
+    40% {
+      clip-path: inset(60% 0 10% 0);
+      transform: translateX(4px);
+    }
+    60% {
+      clip-path: inset(10% 0 70% 0);
+      transform: translateX(-2px);
+    }
+    80% {
+      clip-path: inset(80% 0 5% 0);
+      transform: translateX(3px);
+    }
+  }
+
+  /* Button press effect */
+  .btn-military:active,
+  .btn-primary-military:active {
+    transform: scale(0.97);
+  }
+
+  /* Card hover lift */
+  .military-card-hover:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 20px rgba(90, 99, 53, 0.15);
+  }
+
+  /* Pulsing border for live items */
+  @keyframes borderPulse {
+    0%,
+    100% {
+      border-color: rgba(106, 176, 76, 0.3);
+    }
+    50% {
+      border-color: rgba(106, 176, 76, 0.7);
+    }
+  }
+
+  .border-live {
+    animation: borderPulse 2s ease-in-out infinite;
+  }
+
+  /* Score flash */
+  @keyframes scoreFlash {
+    0%,
+    100% {
+      color: #8fa040;
+    }
+    50% {
+      color: #c4e870;
+      text-shadow: 0 0 12px rgba(143, 160, 64, 0.8);
+    }
+  }
+
+  .score-live {
+    animation: scoreFlash 3s ease-in-out infinite;
+  }
+
+  /* Intro overlay fade */
+  @keyframes introFadeOut {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
 }
